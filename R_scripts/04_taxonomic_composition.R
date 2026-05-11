@@ -33,6 +33,7 @@ suppressPackageStartupMessages({
   library(patchwork)
   library(stringr)
   library(ggVennDiagram)
+  library(scales)
 })
 
 # ---- 1. Configuración ----

@@ -41,7 +41,12 @@ suppressPackageStartupMessages({
 })
 
 # ---- 1. Configuración ----
-OUT_DIR <- "figures/differential_abundance"
+OUT_DIR1 <- here::here("~/Documents/Metagenomics/Microbial-soil/Artículo/")  # Ajustar si los scripts están en R_scripts/
+
+OUT_DIR2 <- "figures/differential_abundance"
+
+OUT_DIR <- file.path(OUT_DIR1, OUT_DIR2)
+
 dir.create(OUT_DIR, recursive = TRUE, showWarnings = FALSE)
 
 # Umbral de significancia
@@ -190,7 +195,7 @@ plot_volcano <- function(results_df, title_str, filename,
   # Preparar columnas si vienen de DESeq2
   if ("log2FoldChange" %in% names(results_df)) {
     results_df <- results_df %>%
-      rename(log2FC = log2FoldChange, p_adj = padj)
+      dplyr::rename(log2FC = log2FoldChange, p_adj = padj)
     results_df$p_value <- results_df$pvalue
   }
 
@@ -211,10 +216,9 @@ plot_volcano <- function(results_df, title_str, filename,
     arrange(p_adj, desc(abs(log2FC))) %>%
     head(label_top)
 
-  vol_colors <- c(
-    paste0("↑ ", g2_label) = "#FF5722",
-    paste0("↑ ", g1_label) = "#2196F3",
-    "ns"                    = "grey70"
+  vol_colors <- setNames(
+    c("#FF5722", "#2196F3", "grey70"),
+    c(paste0("↑ ", g2_label), paste0("↑ ", g1_label), "ns")
   )
 
   p <- ggplot(results_df, aes(x = log2FC, y = neg_log10_p, color = Color)) +
@@ -261,8 +265,9 @@ plot_volcano(wilcox_fungi, "Volcano - Hongos (Wilcoxon)",
 # Volcano con DESeq2 (si está disponible)
 if (!is.null(deseq2_bact)) {
   plot_volcano(deseq2_bact,  "Volcano - Bacterias/Arqueas (DESeq2)",
-               "volcano_bacteria_deseq2.pdf")
+               "volcano_bacteria_deseq2.pdf", fc_col = "log2FoldChange", p_col = "padj")
 }
+
 if (!is.null(deseq2_fungi)) {
   plot_volcano(deseq2_fungi, "Volcano - Hongos (DESeq2)",
                "volcano_fungi_deseq2.pdf")
@@ -377,7 +382,7 @@ plot_top_diff_boxplots <- function(results_df, mat, meta_df, groups_vec,
     geom_jitter(width = 0.1, size = 2.5, alpha = 0.9) +
     scale_fill_manual(values  = site_colors, labels = site_labels) +
     scale_color_manual(values = site_colors, labels = site_labels) +
-    stat_compare_means(method = "wilcox.test", label = "p.format",
+    ggpubr::stat_compare_means(method = "wilcox.test", label = "p.format",
                        size = 3, label.y.npc = 0.95) +
     facet_wrap(~ Taxa, scales = "free_y", ncol = 3) +
     labs(
@@ -455,3 +460,4 @@ cat(sprintf("
 ))
 
 cat("\n✓ Análisis de abundancia diferencial completado. Procede con 06_environmental_analysis.R\n")
+

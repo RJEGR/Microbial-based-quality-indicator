@@ -19,6 +19,10 @@
 # Dependencias: 01_data_import.R, 02_alpha_diversity.R
 # =============================================================================
 
+rm(list = ls())
+
+if(!is.null(dev.list())) dev.off()
+
 # ---- 0. Cargar datos y scripts previos ----
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 source("01_data_import.R")
@@ -41,7 +45,13 @@ suppressPackageStartupMessages({
 })
 
 # ---- 1. Configuración ----
-OUT_DIR <- "figures/environmental_analysis"
+
+OUT_DIR1 <- here::here("~/Documents/Metagenomics/Microbial-soil/Artículo/")  # Ajustar si los scripts están en R_scripts/
+
+OUT_DIR2 <- "figures/environmental_analysis"
+
+OUT_DIR <- file.path(OUT_DIR1, OUT_DIR2)
+
 dir.create(OUT_DIR, recursive = TRUE, showWarnings = FALSE)
 
 site_colors <- c("Rancho_Gil" = "#2196F3", "Rancho_San_Ignacio" = "#FF5722")
@@ -346,6 +356,7 @@ plot_taxa_env_heatmap <- function(cor_list, title_str, filename) {
 
 plot_taxa_env_heatmap(taxa_env_bact,  "Correlación Spearman: Top 30 Bacterias × Variables Ambientales",
                        "heatmap_taxa_env_bacteria.pdf")
+
 plot_taxa_env_heatmap(taxa_env_fungi, "Correlación Spearman: Top 30 Hongos × Variables Ambientales",
                        "heatmap_taxa_env_fungi.pdf")
 
@@ -354,6 +365,8 @@ cat("\n===== SCATTERPLOTS: DIVERSIDAD ALFA vs. VARIABLES AMBIENTALES =====\n")
 
 # Unir diversidad alfa con variables ambientales
 alpha_env_bact <- alpha_bact %>%
+  as.data.frame() %>%
+  `rownames<-`(NULL) %>%
   column_to_rownames("sample_id") %>%
   bind_cols(as.data.frame(env_vars)[rownames(.), ])
 
@@ -408,3 +421,4 @@ write.csv(as.data.frame(taxa_env_fungi$cor),
 cat("  ✓ Tablas exportadas: mantel_test_results.csv, spearman_cor_taxa_env_*.csv\n")
 
 cat("\n✓ Análisis de variables ambientales completado. Procede con 07_network_analysis.R\n")
+

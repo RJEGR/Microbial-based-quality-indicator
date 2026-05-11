@@ -24,6 +24,10 @@
 # Dependencias: 01_data_import.R
 # =============================================================================
 
+rm(list = ls())
+
+if(!is.null(dev.list())) dev.off()
+
 # ---- 0. Cargar datos ----
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 source("01_data_import.R")
@@ -45,7 +49,14 @@ suppressPackageStartupMessages({
 })
 
 # ---- 1. Configuración ----
-OUT_DIR <- "figures/network_analysis"
+
+OUT_DIR1 <- here::here("~/Documents/Metagenomics/Microbial-soil/Artículo/")  # Ajustar si los scripts están en R_scripts/
+
+OUT_DIR2 <- "figures/network_analysis"
+
+OUT_DIR <- file.path(OUT_DIR1, OUT_DIR2)
+
+
 dir.create(OUT_DIR, recursive = TRUE, showWarnings = FALSE)
 
 # Umbrales de red
@@ -197,7 +208,7 @@ compute_network_metrics <- function(g, label = "") {
               global$density, global$avg_degree))
   cat(sprintf("  Coef. clustering: %.4f | Modularidad: %.4f (%d módulos)\n",
               global$avg_clustering, global$modularity, global$n_modules))
-  cat(sprintf("  Diámetro: %d | Distancia media: %.3f\n",
+  cat(sprintf("  Diámetro: %.0f | Distancia media: %.3f\n",
               global$diameter, global$avg_path_length))
 
   cat(sprintf("\n  Top 10 hubs (por grado):\n"))
@@ -250,7 +261,7 @@ plot_network <- function(g, node_metrics, title_str, filename,
     ) +
     geom_node_text(
       aes(label = label),
-      size = 2, repel = TRUE, fontface = "italic",
+      size = 2, repel = TRUE,
       max.overlaps = 15, color = "grey10"
     ) +
     scale_size_continuous(range = c(2, 10), name = "Grado") +
@@ -268,7 +279,7 @@ plot_network <- function(g, node_metrics, title_str, filename,
       legend.position = "right"
     )
 
-  ggsave(file.path(OUT_DIR, filename), p, width = 12, height = 9, dpi = 300)
+  ggsave(file.path(OUT_DIR, filename), p, width = 12, height = 9, dpi = 300, )
   cat(sprintf("  ✓ Red guardada: %s\n", filename))
   return(invisible(p))
 }
@@ -338,7 +349,7 @@ if (nrow(edges_cross) > 0) {
     geom_node_point(aes(size = degree, fill = kingdom),
                     shape = 21, color = "grey30") +
     geom_node_text(aes(label = str_trunc(name, 18, "right")),
-                   size = 1.8, repel = TRUE, fontface = "italic") +
+                   size = 1.8, repel = TRUE) +
     scale_fill_manual(
       values = c("Bacteria/Archaea" = "#2196F3", "Fungi" = "#FF9800"),
       name   = "Reino"
@@ -353,7 +364,7 @@ if (nrow(edges_cross) > 0) {
     theme(plot.title = element_text(face = "bold", size = 12))
 
   ggsave(file.path(OUT_DIR, "network_inter_kingdom.pdf"),
-         p_cross, width = 12, height = 9, dpi = 300)
+         p_cross, width = 12, height = 9, dpi = 300, )
   cat("  ✓ Red inter-reino guardada: network_inter_kingdom.pdf\n")
 
   # Exportar aristas inter-reino

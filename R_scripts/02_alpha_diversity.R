@@ -354,15 +354,18 @@ cat("  ✓ Tablas exportadas: alpha_diversity_all.csv, alpha_statistics.csv\n")
 # ---- 8. Resumen ----
 cat("\n===== RESUMEN DIVERSIDAD ALFA =====\n")
 cat("\nMedianas por sitio (Bacterias):\n")
+
+median_ <- function(x) median(x, na.rm = TRUE)
+
 alpha_bact %>%
   group_by(site) %>%
-  summarise(across(c(Richness, Shannon, Simpson, Evenness, Chao1), median, na.rm = TRUE)) %>%
+  summarise(across(c(Richness, Shannon, Simpson, Evenness, Chao1), median_)) %>%
   print()
 
 cat("\nMedianas por sitio (Hongos):\n")
 alpha_fungi %>%
   group_by(site) %>%
-  summarise(across(c(Richness, Shannon, Simpson, Evenness, Chao1), median, na.rm = TRUE)) %>%
+  summarise(across(c(Richness, Shannon, Simpson, Evenness, Chao1), median_)) %>%
   print()
 
 cat("\n✓ Análisis de diversidad alfa completado. Procede con 03_beta_diversity.R\n")

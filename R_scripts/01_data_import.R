@@ -28,9 +28,9 @@
 # =============================================================================
 
 
-rm(list = ls())
-
-if(!is.null(dev.list())) dev.off()
+# rm(list = ls())
+# 
+# if(!is.null(dev.list())) dev.off()
 
 # ---- 0. Paquetes requeridos ----
 suppressPackageStartupMessages({
@@ -158,7 +158,7 @@ cat(paste("   ", names(meta_raw), collapse = "\n"), "\n")
 
 # Limpiar nombres de columnas (reemplazar espacios y caracteres especiales)
 meta_clean <- meta_raw %>%
-  rename(site_name = Muestra) %>%
+  dplyr::rename(site_name = Muestra) %>%
   # Unir con el mapeo de IDs
   left_join(sample_map, by = "site_name") %>%
   # sample_id como identificador de fila
